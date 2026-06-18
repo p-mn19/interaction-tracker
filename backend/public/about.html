@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>About - Tracker Demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    nav a { margin-right: 16px; color: #4f46e5; text-decoration: none; }
+    .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 16px 0; cursor: pointer; }
+    .card:hover { background: #f1f5f9; }
+    .btn { background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin: 8px 4px; }
+    .btn.green { background: #10b981; }
+    .btn.red { background: #f43f5e; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/demo.html">Home</a>
+    <a href="/about.html">About</a>
+    <a href="/pricing.html">Pricing</a>
+  </nav>
+
+  <h1>About Us</h1>
+  <p>This is the about page. Click around to generate tracking data on this page.</p>
+
+  <div class="card">Team Member 1 — click this card</div>
+  <div class="card">Team Member 2 — click this card</div>
+  <div class="card">Team Member 3 — click this card</div>
+
+  <div style="margin-top: 24px;">
+    <button class="btn">Contact Us</button>
+    <button class="btn green">Join the Team</button>
+    <button class="btn red">Report Issue</button>
+  </div>
+
+  <script src="/tracker.js"></script>
+</body>
+</html>

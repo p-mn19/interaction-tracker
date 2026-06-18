@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pricing - Tracker Demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    nav a { margin-right: 16px; color: #4f46e5; text-decoration: none; }
+    .plan { border: 2px solid #e2e8f0; border-radius: 12px; padding: 24px; margin: 16px 0; cursor: pointer; }
+    .plan.popular { border-color: #4f46e5; }
+    .plan:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .badge { background: #4f46e5; color: white; font-size: 11px; padding: 2px 8px; border-radius: 99px; }
+    .btn { background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%; margin-top: 12px; }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="/demo.html">Home</a>
+    <a href="/about.html">About</a>
+    <a href="/pricing.html">Pricing</a>
+  </nav>
+
+  <h1>Pricing</h1>
+  <p>Click a plan to generate tracking data on this page.</p>
+
+  <div class="plan">
+    <h2>Free</h2>
+    <p>$0 / month — up to 1,000 events</p>
+    <button class="btn">Get Started</button>
+  </div>
+
+  <div class="plan popular">
+    <h2>Pro <span class="badge">Popular</span></h2>
+    <p>$29 / month — unlimited events</p>
+    <button class="btn">Upgrade to Pro</button>
+  </div>
+
+  <div class="plan">
+    <h2>Enterprise</h2>
+    <p>Custom pricing — dedicated support</p>
+    <button class="btn">Contact Sales</button>
+  </div>
+
+  <script src="/tracker.js"></script>
+</body>
+</html>
