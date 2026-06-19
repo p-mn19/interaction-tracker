@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Tracker Demo</title>
+  <title>Home - Tracker Demo</title>
+  <style>
+    body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    nav a { margin-right: 16px; color: #4f46e5; text-decoration: none; }
+    .btn { background: #4f46e5; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; margin: 8px 4px; }
+    .btn.green { background: #10b981; }
+    .click-area { width: 300px; height: 300px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 20px; display: flex; align-items: center; justify-content: center; color: #64748b; cursor: pointer; }
+    .click-area:hover { background: #f1f5f9; }
+  </style>
 </head>
 <body>
 
+  <nav>
+    <a href="/demo.html">Home</a>
+    <a href="/about.html">About</a>
+    <a href="/pricing.html">Pricing</a>
+  </nav>
+
   <h1>Interaction Tracking Demo</h1>
+  <p>Click around this page to generate tracking data.</p>
 
-  <button>Button 1</button>
-  <button>Button 2</button>
+  <button class="btn">Button 1</button>
+  <button class="btn green">Button 2</button>
 
-  <div
-    style="
-      width:300px;
-      height:300px;
-      background:#ddd;
-      margin-top:20px;
-    "
-  >
-    Click Area
-  </div>
+  <div class="click-area">Click Area</div>
 
   <script src="/tracker.js"></script>
 

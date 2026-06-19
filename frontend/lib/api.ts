@@ -15,6 +15,7 @@ export type TrackedEvent = {
   timestamp: string;
   click_x?: number | null;
   click_y?: number | null;
+  element_text?: string | null;
 };
 
 export type HeatmapPoint = {

@@ -33,6 +33,11 @@ const EventSchema = new mongoose.Schema({
     type: Number,
     default: null,
   },
+
+  element_text: {
+    type: String,
+    default: null,
+  },
 });
 
 module.exports = mongoose.model("Event", EventSchema);

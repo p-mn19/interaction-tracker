@@ -45,6 +45,7 @@ export default function SessionJourney({
         event_type: e.event_type,
         page_url: e.page_url,
         timestamp: e.timestamp,
+        element_clicked: e.element_text ?? "",
         click_x: e.click_x ?? "",
         click_y: e.click_y ?? "",
       }))
@@ -119,6 +120,7 @@ export default function SessionJourney({
                     </p>
                     {isClick && (
                       <p className="mt-0.5 font-mono text-xs text-slate-400 dark:text-zinc-600">
+                        {event.element_text ? `"${event.element_text}" · ` : ""}
                         x: {event.click_x} · y: {event.click_y}
                       </p>
                     )}
