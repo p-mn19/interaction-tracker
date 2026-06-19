@@ -1,6 +1,6 @@
 (function () {
 
-  const API_URL = "http://localhost:5000/api/events";
+  const API_URL = "/api/events";
   const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes of inactivity
 
   let sessionId = localStorage.getItem("session_id");
