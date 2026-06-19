@@ -7,6 +7,9 @@ import { downloadCSV } from "@/lib/csv";
 import SessionsTable from "@/components/SessionsTable";
 import SessionJourney from "@/components/SessionJourney";
 import StatsOverview from "@/components/StatsOverview";
+import LiveIndicator from "@/components/LiveIndicator";
+
+const REFRESH_INTERVAL_MS = 10000;
 
 export default function SessionsPage() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -18,23 +21,65 @@ export default function SessionsPage() {
   const [events, setEvents] = useState<TrackedEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(false);
 
+  // Poll the sessions list + page count every 10s. Only the first load
+  // shows a spinner — background refreshes update silently.
   useEffect(() => {
-    Promise.all([getSessions(), getPages()])
-      .then(([sessionData, pages]) => {
+    let active = true;
+
+    async function load(isInitial: boolean) {
+      if (isInitial) setLoading(true);
+      try {
+        const [sessionData, pages] = await Promise.all([getSessions(), getPages()]);
+        if (!active) return;
         setSessions(sessionData);
         setPageCount(pages.length);
-      })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+        setError(null);
+      } catch (err) {
+        if (active) setError((err as Error).message);
+      } finally {
+        if (isInitial && active) setLoading(false);
+      }
+    }
+
+    load(true);
+    const interval = setInterval(() => load(false), REFRESH_INTERVAL_MS);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, []);
+
+  // Poll the selected session's events every 10s, independently of the
+  // sessions list above. Stops automatically when nothing is selected.
+  useEffect(() => {
+    if (!selectedId) return;
+    const sessionId = selectedId;
+    let active = true;
+
+    async function loadEvents(isInitial: boolean) {
+      if (isInitial) setEventsLoading(true);
+      try {
+        const data = await getSessionEvents(sessionId);
+        if (active) setEvents(data);
+      } catch (err) {
+        if (active) setError((err as Error).message);
+      } finally {
+        if (isInitial && active) setEventsLoading(false);
+      }
+    }
+
+    loadEvents(true);
+    const interval = setInterval(() => loadEvents(false), REFRESH_INTERVAL_MS);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [selectedId]);
 
   function handleSelect(sessionId: string) {
     setSelectedId(sessionId);
-    setEventsLoading(true);
-    getSessionEvents(sessionId)
-      .then(setEvents)
-      .catch((err) => setError(err.message))
-      .finally(() => setEventsLoading(false));
   }
 
   const totalEvents = sessions.reduce((sum, s) => sum + s.eventCount, 0);
@@ -57,7 +102,10 @@ export default function SessionsPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-slate-800 dark:text-zinc-100">Sessions</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-semibold text-slate-800 dark:text-zinc-100">Sessions</h1>
+            <LiveIndicator />
+          </div>
           <p className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
             Every visitor session, grouped by ID. Select one to view their journey.
           </p>

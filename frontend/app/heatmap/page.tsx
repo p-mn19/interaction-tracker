@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { getPages, getHeatmap, HeatmapPoint } from "@/lib/api";
 import HeatmapView from "@/components/HeatmapView";
+import LiveIndicator from "@/components/LiveIndicator";
+
+const REFRESH_INTERVAL_MS = 10000;
 
 export default function HeatmapPage() {
   const [pages, setPages] = useState<string[]>([]);
@@ -15,25 +18,45 @@ export default function HeatmapPage() {
     getPages()
       .then((data) => {
         setPages(data);
-        if (data.length > 0) setSelectedPage(data[0]);
+        if (data.length > 0) setSelectedPage((current) => current || data[0]);
       })
       .catch((err) => setError(err.message));
   }, []);
 
+  // Poll the heatmap points for the currently selected page every 10s.
   useEffect(() => {
     if (!selectedPage) return;
-    setLoading(true);
-    getHeatmap(selectedPage)
-      .then(setPoints)
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+    let active = true;
+
+    async function load(isInitial: boolean) {
+      if (isInitial) setLoading(true);
+      try {
+        const data = await getHeatmap(selectedPage);
+        if (active) setPoints(data);
+      } catch (err) {
+        if (active) setError((err as Error).message);
+      } finally {
+        if (isInitial && active) setLoading(false);
+      }
+    }
+
+    load(true);
+    const interval = setInterval(() => load(false), REFRESH_INTERVAL_MS);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
   }, [selectedPage]);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-slate-800 dark:text-zinc-100">Heatmap</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-semibold text-slate-800 dark:text-zinc-100">Heatmap</h1>
+            <LiveIndicator />
+          </div>
           <p className="mt-1 text-sm text-slate-500 dark:text-zinc-400">
             Visual click density by page. Pick a page to see where visitors clicked.
           </p>
