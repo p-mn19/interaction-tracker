@@ -38,25 +38,31 @@ async function handleResponse<T>(res: Response): Promise<T> {
 }
 
 export function getSessions(): Promise<Session[]> {
-  return fetch(`${API_URL}/api/sessions`).then((res) => handleResponse<Session[]>(res));
+  return fetch(`${API_URL}/api/sessions`, { cache: "no-store" }).then((res) =>
+    handleResponse<Session[]>(res)
+  );
 }
 
 export function getSessionEvents(sessionId: string): Promise<TrackedEvent[]> {
-  return fetch(`${API_URL}/api/sessions/${sessionId}`).then((res) =>
+  return fetch(`${API_URL}/api/sessions/${sessionId}`, { cache: "no-store" }).then((res) =>
     handleResponse<TrackedEvent[]>(res)
   );
 }
 
 export function getPages(): Promise<string[]> {
-  return fetch(`${API_URL}/api/pages`).then((res) => handleResponse<string[]>(res));
-}
-
-export function getHeatmap(pageUrl: string): Promise<HeatmapPoint[]> {
-  return fetch(`${API_URL}/api/heatmap?page=${encodeURIComponent(pageUrl)}`).then((res) =>
-    handleResponse<HeatmapPoint[]>(res)
+  return fetch(`${API_URL}/api/pages`, { cache: "no-store" }).then((res) =>
+    handleResponse<string[]>(res)
   );
 }
 
+export function getHeatmap(pageUrl: string): Promise<HeatmapPoint[]> {
+  return fetch(`${API_URL}/api/heatmap?page=${encodeURIComponent(pageUrl)}`, {
+    cache: "no-store",
+  }).then((res) => handleResponse<HeatmapPoint[]>(res));
+}
+
 export function getTopPages(): Promise<TopPage[]> {
-  return fetch(`${API_URL}/api/top-pages`).then((res) => handleResponse<TopPage[]>(res));
+  return fetch(`${API_URL}/api/top-pages`, { cache: "no-store" }).then((res) =>
+    handleResponse<TopPage[]>(res)
+  );
 }
