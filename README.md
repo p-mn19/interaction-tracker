@@ -6,6 +6,15 @@ The project has two parts: `backend/` (Express API + MongoDB + a static demo sit
 
 ---
 
+## Live Demo
+
+- Dashboard: `https://interaction-tracker-theta.vercel.app/sessions`
+- Backend API: `https://interaction-tracker-n7mm.onrender.com`
+- Demo pages (for generating test data): `https://interaction-tracker-n7mm.onrender.com/demo.html`, `/about.html`, `/pricing.html`
+
+
+---
+
 ## Tech Stack
 
 **Backend:** Node.js, Express, MongoDB (Atlas), Mongoose, CORS, dotenv, nodemon for local development.
@@ -80,6 +89,18 @@ Run with `npm run dev` and open `http://localhost:3000`.
 
 ---
 
+## Deployment
+
+**Backend (Render):** New Web Service → connect the GitHub repo → Root Directory `backend` → Build Command `npm install` → Start Command `npm start` → add environment variable `MONGODB_URI`. Render assigns `PORT` automatically.
+
+**Frontend (Vercel):** Import the same repo → Root Directory `frontend` → add environment variable `NEXT_PUBLIC_API_URL` set to the Render service URL → deploy.
+
+**Database (MongoDB Atlas):** Network Access must allow `0.0.0.0/0`, since Render's free tier doesn't use a fixed outbound IP.
+
+**Tracker script:** `tracker.js` calls the API via a relative path (`/api/events`) rather than a hardcoded URL, since it's served from the same origin as the backend on Render. No changes are needed to it across environments.
+
+---
+
 ## API Reference
 
 | Method | Endpoint                   | Purpose                                              |
@@ -101,7 +122,11 @@ Run with `npm run dev` and open `http://localhost:3000`.
 
 **Heatmap dots use a soft radial gradient with a screen blend** rather than solid markers, so overlapping clicks visually brighten into denser "hot zones" the way a real heatmap does. The trade-off is that individual clicks read as soft glows rather than sharp points — chosen deliberately over a crisper alternative because it better represents click density, which is the actual purpose of a heatmap.
 
-**No authentication** on the dashboard or API. Fine for local development and evaluation, but the event-ingestion endpoint should not be deployed publicly without rate limiting at minimum.
+**No authentication** on the dashboard or API. This was an acceptable trade-off during local development, but now that the backend is deployed and publicly reachable, it means anyone with the Render URL can submit arbitrary events or browse all recorded session data. Acceptable for an assignment or demo; a production version would need at minimum rate limiting on `/api/events` and some form of access control on the dashboard.
+
+**CORS is fully open** (`cors()` with no origin restriction), which is what allows the Vercel-hosted dashboard to call the Render-hosted API. The trade-off is that any website, not just the deployed dashboard, can also call the API from a browser. Locking this down to the specific Vercel domain would be the natural next step before any real-world use.
+
+**Render's free tier sleeps after 15 minutes of inactivity**, so the first request after a quiet period is slow (30-60 seconds) while the instance restarts. This is a hosting-tier limitation, not an application issue, and would disappear on a paid instance.
 
 **Search and CSV export run client-side** against already-fetched data rather than as backend queries. Fast at this scale, but wouldn't hold up at a much larger volume of sessions without server-side pagination.
 
