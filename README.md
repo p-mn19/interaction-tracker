@@ -115,23 +115,20 @@ Run with `npm run dev` and open `http://localhost:3000`.
 ---
 
 ## Assumptions and Trade-offs
+**Session identification** uses a UUID in `localStorage`, expiring after 30 minutes of inactivity (the standard analytics definition). Tied to a browser profile, not a person.
 
-**Session identification** is a UUID in `localStorage`, generated on first visit and reused across page loads. A session expires after 30 minutes of inactivity — the standard definition used by most analytics tools — at which point a new UUID is generated on the next visit. Sessions are still tied to a browser profile rather than a person, so clearing storage or switching browsers always starts a new session regardless of timing.
+**Click coordinates are page-relative** (scroll included), so they're consistent regardless of scroll position, but not across different viewport widths — accurate for one consistent screen size, not aggregated across many.
 
-**Click coordinates are page-relative** (scroll offset included), so the same element gives consistent coordinates regardless of scroll position. They don't account for different browser window or screen widths, so aggregating clicks across very different viewport sizes can skew the heatmap. Accurate for a single consistent viewport.
+**Heatmap dots use a soft gradient with a screen blend** rather than solid markers, so dense clusters visually brighten. Trade-off: individual clicks read as soft glows, chosen deliberately to represent density over per-click precision.
 
-**Heatmap dots use a soft radial gradient with a screen blend** rather than solid markers, so overlapping clicks visually brighten into denser "hot zones" the way a real heatmap does. The trade-off is that individual clicks read as soft glows rather than sharp points — chosen deliberately over a crisper alternative because it better represents click density, which is the actual purpose of a heatmap.
+**No authentication** on the dashboard or API, and **CORS is fully open**. Fine for a demo; a production version would need rate limiting and access control.
 
-**No authentication** on the dashboard or API. This was an acceptable trade-off during local development, but now that the backend is deployed and publicly reachable, it means anyone with the Render URL can submit arbitrary events or browse all recorded session data. Acceptable for an assignment or demo; a production version would need at minimum rate limiting on `/api/events` and some form of access control on the dashboard.
+**Render's free tier sleeps after 15 minutes idle**, so the first request after a quiet period takes 30-60 seconds — a hosting limitation, not a bug.
 
-**CORS is fully open** (`cors()` with no origin restriction), which is what allows the Vercel-hosted dashboard to call the Render-hosted API. The trade-off is that any website, not just the deployed dashboard, can also call the API from a browser. Locking this down to the specific Vercel domain would be the natural next step before any real-world use.
+**Search, CSV export, and most stats run client-side** against already-fetched data. Fast at this scale; wouldn't hold up at much larger volume without server-side pagination. Top Pages is the exception, using a real MongoDB aggregation.
 
-**Render's free tier sleeps after 15 minutes of inactivity**, so the first request after a quiet period is slow (30-60 seconds) while the instance restarts. This is a hosting-tier limitation, not an application issue, and would disappear on a paid instance.
+**Auto-refresh is 10-second polling**, not WebSockets — simple, and indistinguishable from real-time at this scale, but with a built-in delay and only while a tab is open.
 
-**Search and CSV export run client-side** against already-fetched data rather than as backend queries. Fast at this scale, but wouldn't hold up at a much larger volume of sessions without server-side pagination.
+**Single MongoDB collection** for all events; sessions and pages are derived via aggregation rather than stored separately. Simpler writes, slightly heavier reads.
 
-**Most dashboard stats are computed client-side** from data already loaded. The exception is Top Pages, which uses a real MongoDB aggregation since it requires data the dashboard doesn't otherwise have.
-
-**Single MongoDB collection** for all events; sessions and page lists are derived at query time via aggregation rather than stored as separate records. Simpler write path, slightly heavier reads — the right trade-off at this scale.
-
-**No automated tests.** Testing was done manually through the demo pages given the project's scope.
+**No automated tests** — testing was manual, given the project's scope.
